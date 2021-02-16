@@ -15,10 +15,15 @@ void ShowInfo(struct Team temp);
 void MainSet(struct Team* value, const int length);
 void MainShow(struct Team* value, const int length);
 void SearchMaximum(struct Team* value, const int length);
+
 int main(void) 
 {
-	int s = 3;
-	struct Team list[3];
+	int s; // кол-во команд
+	fprintf(stdout,"Specify the number of teams: ");
+	scanf("%d", &s);getchar();
+	fprintf(stdout, "\n");
+	
+	struct Team list[s];
 
 	MainSet(&list[0], s);
 	MainShow(&list[0], s);
