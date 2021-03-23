@@ -1,0 +1,2 @@
+D:\WORLD PROGRAMMING\Programming\C++\SnakeSimple\Debug\SnakeSimple.exe
+D:\WORLD PROGRAMMING\Programming\C++\SnakeSimple\Debug\SnakeSimple.pdb
