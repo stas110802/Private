@@ -1,42 +1,57 @@
-﻿#include <iostream>
+#include <iostream>
 #include <conio.h>
 #include <windows.h>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
-class Snake 
+void setCursor(int x, int y)
+{
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+
+class Snake
 {
 protected:
 	bool gameOver = false;
-	bool SetGameOver(bool value) { gameOver = value; }
+	void SetGameOver(bool value) { gameOver = value; }
 private:
 	const int width = 30;
 	const int height = 20;
 
-	int x = width / 2,
-		y = height / 2,
-		fruitX = rand() % width,
-		fruitY = rand() % height,
-		score = 0;
-	int tailX[100], tailY[100];
-	int nTail;
+	int x = width / 2;
+	int	y = height / 2;
+
+	int	fruitX = rand() % width;
+	int	fruitY = rand() % height;
+
+	int	score = 0;
+
+	int tailX[600];
+	int	tailY[600];
+
+	int nTail = 0;
+
 	enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN };
 
-	eDirecton dir = STOP; 
+	eDirecton dir = STOP;
+
+	void GamePause()
+	{
+		while (!_kbhit() || (_kbhit() && _getch() == 'p'))// пауза пока не нажали клавишу ( кроме 'p' ) 
+		{
+			DrawPauseMenu();
+		}
+		system("cls");
+	}
 public:
 	bool GetGameOver() { return gameOver; }
-	/*
-	void Setup()
-	{
-		gameOver = false;
-		dir = STOP;
-		x = width / 2;
-		y = height / 2;
-		fruitX = rand() % width;
-		fruitY = rand() % height;
-		score = 0;
-	}
-	*/
+
 	void Draw()
 	{
 		system("cls"); //system("clear");
@@ -68,8 +83,6 @@ public:
 					if (!print)
 						cout << " ";
 				}
-
-
 				if (j == width - 1)
 					cout << "#";
 			}
@@ -81,6 +94,33 @@ public:
 		cout << endl;
 		cout << "Score:" << score << endl;
 	}
+
+	void DrawPauseMenu()
+	{
+		system("cls");
+
+		for (int i = 49; i < 53; i++)
+		{
+			string temp1{"D:\\WORLD PROGRAMMING\\Programming\\C++\\SnakeSimple\\PauseTemp\\"};
+			string temp2{".txt" };
+			string line;
+			temp1 = temp1 + char(i) + temp2;// конкотенация
+			ifstream in(temp1); // окрываем файл для чтения
+			
+			if (in.is_open())
+			{		
+				while (getline(in, line))
+				{
+					cout << line << endl;
+				}
+			}
+			in.close();     // закрываем файл
+			Sleep(500);
+			
+		}
+		
+	}
+
 	void Input()
 	{
 		if (_kbhit())
@@ -102,67 +142,73 @@ public:
 			case 'x':
 				gameOver = true;
 				break;
+			case 'p':
+				GamePause();
+				break;
 			}
 		}
 	}
 	void Logic()
-	{
-		int prevX = tailX[0];
-		int prevY = tailY[0];
-		int prev2X, prev2Y;
-		tailX[0] = x;
-		tailY[0] = y;
+	{		
+		int tX = x;
+		int tY = y;
+		int tempX ;
+		int tempY ;
 
-		for (int i = 1; i < nTail; i++)
+		for (int i = 0; i < nTail; i++) // 3
 		{
-			prev2X = tailX[i];
-			prev2Y = tailY[i];
-			tailX[i] = prevX;
-			tailY[i] = prevY;
-			prevX = prev2X;
-			prevY = prev2Y;
+			// запоминаем
+			tempX = tailX[i];
+			tempY = tailY[i];
+			// инициализируем
+			tailX[i] = tX;
+			tailY[i] = tY;
+			// делаем шаг
+			tX = tempX;
+			tY = tempY;
+			
 		}
 
-		 switch (dir)
-		 {
-			 case LEFT:
-			 {
-				 x--;
-				 break;
-			 }
-			 case RIGHT:
-			 {
-				 x++;
-				 break;
-			 }
-			 case UP: 
-			 {
-				 y--;
-				 break;
-			 }
-			 case DOWN: 
-			 {
-				 y++;
-				 break;
-			 }
-			 default:
-				 break;
-		 }
+		switch (dir)
+		{
+		case LEFT:
+		{
+			x--;
+			break;
+		}
+		case RIGHT:
+		{
+			x++;
+			break;
+		}
+		case UP:
+		{
+			y--;
+			break;
+		}
+		case DOWN:
+		{
+			y++;
+			break;
+		}
+		default:
+			break;
+		}
 
-		 if (x >= width) x = 0; else if (x < 0) x = width - 1;
-		 if (y >= height) y = 0; else if (y < 0) y = height - 1;
+		if (x >= width) x = 0; else if (x < 0) x = width - 1;
+		if (y >= height) y = 0; else if (y < 0) y = height - 1;
 
-		 for (int i = 0; i < nTail; i++)
-			 if (tailX[i] == x && tailY[i] == y)
-				 gameOver = true;
+		for (int i = 0; i < nTail; i++)
+			if (tailX[i] == x && tailY[i] == y)
+				gameOver = true;
 
-		 if (x == fruitX && y == fruitY)
-		 {
-			 score += 10;
-			 fruitX = rand() % width;
-			 fruitY = rand() % height;
-			 nTail++;
-		 }
+		if (x == fruitX && y == fruitY)
+		{
+			score += 1;
+			fruitX = rand() % width;
+			fruitY = rand() % height;
+			nTail++;
+		}
 	}
 
 };
@@ -171,6 +217,7 @@ class GameMenu : Snake
 {
 private:
 	int i = 1;
+	int st = 1;
 	bool turnEnd = false;
 public:
 	string dtr[6]
@@ -182,50 +229,78 @@ public:
 		"#      EXIT       #",
 		"###################"
 	};
+
 	void Print()
 	{
-		for (int i = 0; i < 6; i++)
+		Print(i);
+	}
+
+	void Print(int val)
+	{
+		system("cls");
+
+		if (val == 1) i = 49;
+		if (val == 2) i = 50;
+		if (val == 3) i = 51;
+		if (val == 4) i = 52;
+
+		string temp1{ "D:\\WORLD PROGRAMMING\\Programming\\C++\\SnakeSimple\\PauseTemp\\menu" };
+		string temp2{ ".txt" };
+		string line;
+		temp1 = temp1 + char(i) + temp2;// конкотенация
+		ifstream in(temp1); // окрываем файл для чтения
+
+		if (in.is_open())
 		{
-				cout << dtr[i] << endl;		
+			while (getline(in, line))
+			{
+				cout << line << endl;
+			}
 		}
+		in.close();     // закрываем файл		
 	}
 	void Logic()
 	{
-		if (_kbhit()) 
+		if (_kbhit())
 		{
 			switch (_getch())
 			{
 			case 'w':
 			{
-				if (i != 1) 
+				if (st != 1)
 				{
-					dtr[i][5] = ' ';
-					i--;
+					st--;
+					Print(st);
 				}
-				dtr[i][5] = '>';
+				
 				break;
 			}
 			case 's':
 			{
-				if (i != 4)
+				if (st != 4)
 				{
-					dtr[i][5] = ' ';
-					i++;
+					st++;
+					Print(st);
+					
 				}
-				dtr[i][5] = '>';
+				
 				break;
 			}
 			case 'f': {
-				if (i == 1) {// START
+				if (st == 1)
+				{// START
 					turnEnd = true;
 				}
-				if (i == 2) {// INFO
+				if (st == 2)
+				{// INFO
 					turnEnd = true;
 				}
-				if (i == 3) {// SAVE
+				if (st == 3)
+				{// SAVE
 					turnEnd = true;
 				}
-				if (i == 4) {// EXIT
+				if (st == 4)
+				{// EXIT
 					SetGameOver(true);
 					turnEnd = true;
 				}
@@ -241,23 +316,26 @@ public:
 
 int main()
 {
-	Snake snake;
-	GameMenu menu;
-	//snake.Setup();
-	
+	Snake snake;//
+	GameMenu menu;//
+	system("Color D");
+
 	while (!menu.GetTurnEnd())
 	{
+		setCursor(0, 0);
 		menu.Print();
 		menu.Logic();
 		system("cls");
 	}
 
-	while (!snake.GetGameOver() )
+	while (!snake.GetGameOver())
 	{
+		setCursor(0, 0);
 		snake.Draw();
 		snake.Input();
 		snake.Logic();
-		Sleep(30);//sleep(10);
+		Sleep(30);
 	}
+
 	return 0;
 }
