@@ -1,2 +1,3 @@
 ﻿  SnakeSimple.cpp
+D:\WORLD PROGRAMMING\Programming\C++\SnakeSimple\SnakeSimple.cpp(317,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
   SnakeSimple.vcxproj -> D:\WORLD PROGRAMMING\Programming\C++\SnakeSimple\Debug\SnakeSimple.exe
